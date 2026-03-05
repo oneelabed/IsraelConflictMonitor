@@ -15,3 +15,6 @@ A high-performance, concurrent backend service built in Go that allows users to 
 - **Router**: Chi Router (with sub-routing and middleware)
 - **SQL Toolkit**: SQLC (Type-safe query generation)
 - **Migrations**: Goose
+
+## 🔒 Authentication
+Unique API Keys are generated upon user registration and required in the Authorization header to verify identity for all protected routes.
