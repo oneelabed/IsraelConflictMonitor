@@ -7,6 +7,7 @@ A high-performance, concurrent backend service built in Go that allows users to 
 - **Database Migrations**: Managed schema evolution using Goose to handle versioned SQL migrations.
 - **Custom Authentication**: Secure API access via API Key-based authentication implemented through custom middleware.
 - **Automated Scheduling**: Intelligent fetching logic that prioritizes feeds based on their last fetched timestamp.
+- **Full-Text Search**: Integrated PostgreSQL's full-text search engine to allow users to filter and find specific posts by title or description across all followed feeds.
 
 ## 🛠️ Tech Stack
 - **Language**: Go (Golang)
