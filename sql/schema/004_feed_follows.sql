@@ -1,5 +1,4 @@
 -- +goose Up 
-
 CREATE TABLE feed_follows (
     id UUID PRIMARY KEY,
     created_at TIMESTAMP NOT NULL,
