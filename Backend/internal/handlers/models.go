@@ -100,7 +100,7 @@ func DBPostToPost(dbPost database.Post) Post {
 	}
 
 	return Post{
-		ID:          dbPost.FeedID,
+		ID:          dbPost.ID,
 		CreatedAt:   dbPost.CreatedAt,
 		UpdatedAt:   dbPost.UpdatedAt,
 		Title:       dbPost.Title,

@@ -50,7 +50,14 @@ func ScrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 		return
 	}
 
+	notRelevant := 0
+
 	for _, item := range rssFeed.Channel.Item {
+		if !IsRelevant(item.Title, item.Description) {
+			notRelevant++
+			continue
+		}
+
 		desc := sql.NullString{}
 		if len(item.Description) != 0 {
 			desc.String = item.Description
@@ -60,7 +67,7 @@ func ScrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 		pubDate, err := time.Parse(time.RFC1123, item.PubDate)
 		if err != nil {
 			log.Println("Couldn't parse date:", err)
-			return
+			continue
 		}
 
 		_, err = db.CreatePost(context.Background(), database.CreatePostParams{
@@ -81,5 +88,30 @@ func ScrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 			return
 		}
 	}
-	log.Printf("Feed %s collected, %v posts found", feed.Name, len(rssFeed.Channel.Item))
+	log.Printf("Feed %s collected, %v posts found", feed.Name, len(rssFeed.Channel.Item)-notRelevant)
+}
+
+func IsRelevant(title, description string) bool {
+	var keywords = []string{
+		"israel",
+		"idf",
+		"gaza",
+		"hamas",
+		"hezbollah",
+		"lebanon",
+		"west bank",
+		"jerusalem",
+		"tel aviv",
+		"iran",
+	}
+
+	text := strings.ToLower(title + " " + description)
+
+	for _, k := range keywords {
+		if strings.Contains(text, k) {
+			return true
+		}
+	}
+
+	return false
 }
