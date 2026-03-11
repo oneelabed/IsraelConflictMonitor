@@ -46,10 +46,7 @@ func HandlerGetUserByAPI(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Reque
 }
 
 func HandlerGetPostsForUser(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request, user database.User) {
-	posts, err := apiCfg.DB.GetPostsForUser(r.Context(), database.GetPostsForUserParams{
-		UserID: user.ID,
-		Limit:  10,
-	})
+	posts, err := apiCfg.DB.GetPostsForUser(r.Context(), user.ID)
 	if err != nil {
 		RespondWithError(w, 400, fmt.Sprintf("Failed to get posts: %v", err))
 		return
@@ -73,7 +70,6 @@ func HandlerSearchPosts(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Reques
 	posts, err := apiCfg.DB.SearchPostsForUser(r.Context(), database.SearchPostsForUserParams{
 		UserID:  user.ID,
 		Column2: param2,
-		Limit:   10,
 	})
 	if err != nil {
 		RespondWithError(w, 400, fmt.Sprintf("Search failed: %v", err))
