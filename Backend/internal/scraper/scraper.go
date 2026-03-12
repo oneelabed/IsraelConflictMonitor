@@ -3,6 +3,7 @@ package scraper
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"strings"
 	"sync"
@@ -40,13 +41,13 @@ func ScrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 
 	_, err := db.MarkFeedAsFetched(context.Background(), feed.ID)
 	if err != nil {
-		log.Println("Error marking feed as fetched:", err)
+		log.Printf("Error marking feed %v as fetched: %v", feed.Name, err)
 		return
 	}
 
 	rssFeed, err := UrlToFeed(feed.Url)
 	if err != nil {
-		log.Println("Error fetching feed:", err)
+		log.Printf("Error fetching feed %v: %v\n", feed.Name, err)
 		return
 	}
 
@@ -64,11 +65,23 @@ func ScrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 			desc.Valid = true
 		}
 
-		pubDate, err := time.Parse(time.RFC1123, item.PubDate)
+		pubDate, err := flexibleDate(item.PubDate)
 		if err != nil {
-			log.Println("Couldn't parse date:", err)
+			log.Printf("Couldn't parse date for feed %v: %v", feed.Name, err)
 			continue
 		}
+		/*pubDate, err := time.Parse(time.RFC1123, item.PubDate)
+		if err != nil {
+			if strings.Contains(err.Error(), `parsing time ""`) {
+				pubDate = time.Now()
+			} else {
+				pubDate, err = time.Parse(time.RFC1123Z, item.PubDate)
+				if err != nil {
+					log.Printf("Couldn't parse date for feed %v: %v", feed.Name, err)
+					continue
+				}
+			}
+		}*/
 
 		_, err = db.CreatePost(context.Background(), database.CreatePostParams{
 			ID:          uuid.New(),
@@ -132,4 +145,14 @@ func IsRelevant(title, description string) bool {
 	}
 
 	return false
+}
+
+func flexibleDate(dateStr string) (time.Time, error) {
+	layouts := []string{time.RFC1123, time.RFC1123Z, time.RFC3339, "2006-01-02T15:04:05-0700", "Mon, 02 Jan 2006 15:04:05", ""}
+	for _, layout := range layouts {
+		if t, err := time.Parse(layout, dateStr); err == nil {
+			return t, nil
+		}
+	}
+	return time.Time{}, fmt.Errorf("unknown date format: %s", dateStr)
 }

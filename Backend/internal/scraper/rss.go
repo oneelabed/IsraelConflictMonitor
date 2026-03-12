@@ -2,8 +2,10 @@ package scraper
 
 import (
 	"encoding/xml"
+	//"html"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -41,9 +43,26 @@ func UrlToFeed(url string) (RSSFeed, error) {
 		return RSSFeed{}, err
 	}
 
+	/*sanitizedData := html.UnescapeString(string(data))
+	sanitizedData = strings.ReplaceAll(sanitizedData, "&bull;", "•")
+	sanitizedData = strings.ReplaceAll(string(data), "&", "&amp;")*/
+	xmlString := string(data)
+	xmlString = strings.ReplaceAll(xmlString, "& ", "&amp; ")
+
+	reader := strings.NewReader(xmlString)
+	decoder := xml.NewDecoder(reader)
+
+	decoder.Strict = false
+	// This tells the decoder to automatically handle HTML entities
+	decoder.Entity = xml.HTMLEntity
+
 	rssFeed := RSSFeed{}
 
-	err = xml.Unmarshal(data, &rssFeed)
+	/*err = xml.Unmarshal([]byte(sanitizedData), &rssFeed)
+	if err != nil {
+		return RSSFeed{}, err
+	}*/
+	err = decoder.Decode(&rssFeed)
 	if err != nil {
 		return RSSFeed{}, err
 	}

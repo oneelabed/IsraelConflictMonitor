@@ -41,7 +41,7 @@ func main() {
 		DB: database.New(conn),
 	}
 
-	go StartScraping(apiCfg.DB, 10, time.Minute)
+	go StartScraping(apiCfg.DB, 23, time.Minute)
 
 	router := chi.NewRouter()
 
