@@ -154,6 +154,35 @@ func DBPostRowsToPosts(dbPosts []database.GetPostsForUserRow) []Post {
 	return posts
 }
 
+// New helper for the JOIN query results
+func DBDiverseRowToPost(dbPost database.GetDiversePostsRow) Post {
+	var desc *string
+	if dbPost.Description.Valid {
+		desc = &dbPost.Description.String
+	}
+
+	return Post{
+		ID:          dbPost.ID,
+		CreatedAt:   dbPost.CreatedAt,
+		UpdatedAt:   dbPost.UpdatedAt,
+		Title:       dbPost.Title,
+		Description: desc,
+		PublishedAt: dbPost.PublishedAt,
+		Url:         dbPost.Url,
+		FeedID:      dbPost.FeedID,
+		FeedName:    dbPost.FeedName,
+		FeedIcon:    dbPost.FeedIcon,
+	}
+}
+
+func DBDiverseRowsToPosts(dbPosts []database.GetDiversePostsRow) []Post {
+	posts := []Post{}
+	for _, post := range dbPosts {
+		posts = append(posts, DBDiverseRowToPost(post))
+	}
+	return posts
+}
+
 // Converter for the Search Query Rows
 func DBSearchRowToPost(dbPost database.SearchPostsForUserRow) Post {
 	var desc *string

@@ -55,6 +55,71 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 	return i, err
 }
 
+const getDiversePosts = `-- name: GetDiversePosts :many
+WITH RankedPosts AS (
+    SELECT 
+        posts.id, posts.created_at, posts.updated_at, posts.title, posts.description, posts.published_at, posts.url, posts.feed_id, 
+        feeds.name AS feed_name, 
+        feeds.icon_url AS feed_icon,
+        ROW_NUMBER() OVER (PARTITION BY posts.feed_id ORDER BY posts.published_at DESC) as rank
+    FROM posts
+    JOIN feeds ON posts.feed_id = feeds.id
+)
+SELECT id, created_at, updated_at, title, description, published_at, url, feed_id, feed_name, feed_icon, rank FROM RankedPosts 
+WHERE rank <= 10 
+ORDER BY published_at DESC 
+LIMIT $1
+`
+
+type GetDiversePostsRow struct {
+	ID          uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Title       string
+	Description sql.NullString
+	PublishedAt time.Time
+	Url         string
+	FeedID      uuid.UUID
+	FeedName    string
+	FeedIcon    string
+	Rank        int64
+}
+
+func (q *Queries) GetDiversePosts(ctx context.Context, limit int32) ([]GetDiversePostsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getDiversePosts, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetDiversePostsRow
+	for rows.Next() {
+		var i GetDiversePostsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Title,
+			&i.Description,
+			&i.PublishedAt,
+			&i.Url,
+			&i.FeedID,
+			&i.FeedName,
+			&i.FeedIcon,
+			&i.Rank,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getPostsForUser = `-- name: GetPostsForUser :many
 SELECT 
     posts.id, posts.created_at, posts.updated_at, posts.title, posts.description, posts.published_at, posts.url, posts.feed_id, 
