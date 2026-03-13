@@ -67,6 +67,7 @@ func ScrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 		}
 
 		pubDate, err := flexibleDate(item.PubDate)
+
 		if err != nil {
 			log.Printf("Couldn't parse date for feed %v: %v", feed.Name, err)
 			continue
@@ -167,7 +168,11 @@ func IsRelevant(title, description string) bool {
 }
 
 func flexibleDate(dateStr string) (time.Time, error) {
-	layouts := []string{time.RFC1123, time.RFC1123Z, time.RFC3339, "2006-01-02T15:04:05-0700", "Mon, 02 Jan 2006 15:04:05"}
+	layouts := []string{time.RFC1123, time.RFC1123Z, time.RFC3339,
+		"2006-01-02T15:04:05-0700", "Mon, 02 Jan 2006 15:04:05", "Mon, 02 Jan 06 15:04:05 -0700"}
+
+	dateStr = strings.TrimSpace(dateStr) // remove trailing/leading spaces
+
 	for _, layout := range layouts {
 		if t, err := time.Parse(layout, dateStr); err == nil {
 			return t, nil
