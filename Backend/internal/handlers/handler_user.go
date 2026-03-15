@@ -51,6 +51,35 @@ func HandlerCreateUser(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request
 	RespondWithJSON(w, 201, DBUserToUser(user))
 }
 
+func HandlerLogin(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	params := parameters{}
+	err := decoder.Decode(&params)
+	if err != nil {
+		RespondWithError(w, 400, "Invalid request payload")
+		return
+	}
+
+	user, err := apiCfg.DB.GetUserByUsername(r.Context(), params.Username)
+	if err != nil {
+		RespondWithError(w, 401, "Invalid username or password")
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(params.Password))
+	if err != nil {
+		RespondWithError(w, 401, "Invalid username or password")
+		return
+	}
+
+	RespondWithJSON(w, 200, DBUserToUser(user))
+}
+
 func HandlerGetUserByAPI(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request, user database.User) {
 	RespondWithJSON(w, 200, DBUserToUser(user))
 }
