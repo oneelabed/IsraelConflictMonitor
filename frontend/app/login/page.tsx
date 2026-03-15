@@ -6,7 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { login } from "@/lib/actions/Login";
+import { login } from "@/lib/actions/login";
 import { useRouter } from "next/navigation";
 
 export default function SignUp() {
@@ -24,7 +24,7 @@ export default function SignUp() {
       
       localStorage.setItem("api_key", userData.api_key);
       localStorage.setItem("username", userData.name);
-      
+
       console.log("Logged in successfully:", userData);
 
       router.push("/");
