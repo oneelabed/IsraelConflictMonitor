@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/google/uuid"
 	. "github.com/oneelabed/IsraelConflictMonitor/internal/config"
 	"github.com/oneelabed/IsraelConflictMonitor/internal/database"
@@ -28,12 +30,18 @@ func HandlerCreateUser(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(params.Password), bcrypt.DefaultCost)
+	if err != nil {
+		RespondWithError(w, 500, "Couldn't hash password")
+		return
+	}
+
 	user, err := apiCfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		ID:           uuid.New(),
 		CreatedAt:    time.Now().UTC(),
 		UpdatedAt:    time.Now().UTC(),
 		Username:     params.Username,
-		PasswordHash: params.Password,
+		PasswordHash: string(hashedPassword),
 	})
 	if err != nil {
 		RespondWithError(w, 400, fmt.Sprintf("Couldn't create user: %v", err))
