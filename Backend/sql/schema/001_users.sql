@@ -4,7 +4,7 @@ CREATE TABLE users (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     username TEXT UNIQUE NOT NULL,
-    password_hash TEXT
+    password_hash TEXT NOT NULL
 );
 
 -- +goose Down 

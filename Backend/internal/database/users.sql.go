@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,7 +25,7 @@ type CreateUserParams struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	Username     string
-	PasswordHash sql.NullString
+	PasswordHash string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {

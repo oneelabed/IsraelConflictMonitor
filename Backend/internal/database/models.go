@@ -45,6 +45,6 @@ type User struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	Username     string
-	PasswordHash sql.NullString
+	PasswordHash string
 	ApiKey       string
 }
