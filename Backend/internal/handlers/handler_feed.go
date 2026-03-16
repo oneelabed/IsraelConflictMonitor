@@ -32,6 +32,7 @@ func HandlerCreateFeed(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request
 		UpdatedAt: time.Now().UTC(),
 		Name:      params.Name,
 		Url:       params.Url,
+		IconUrl:   params.IconURL,
 	})
 	if err != nil {
 		RespondWithError(w, 400, fmt.Sprintf("Couldn't create feed: %v", err))
