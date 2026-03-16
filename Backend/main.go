@@ -76,6 +76,7 @@ func main() {
 	v1router.Get("/posts/diverse", func(w http.ResponseWriter, r *http.Request) {
 		HandlerGetDiversePosts(&apiCfg, w, r)
 	})
+	v1router.Get("/posts/check-new", MiddlewareAuth(&apiCfg, HandlerCheckNewPosts))
 
 	router.Mount("/v1", v1router)
 
