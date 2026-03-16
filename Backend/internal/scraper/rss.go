@@ -41,6 +41,8 @@ func UrlToFeed(url string) (RSSFeed, error) {
 	// This stops Cloudflare from blocking your Render server
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 	req.Header.Set("Accept", "application/rss+xml, application/xml, text/xml")
+	req.Header.Set("Accept-Language", "he-IL,he;q=0.9,en-US;q=0.8,en;q=0.7") // <--- Tell them you speak Hebrew
+	req.Header.Set("Referer", "https://www.timesofisrael.com/")              // <--- Pretend you came from their homepage
 
 	// 3. Execute the request
 	resp, err := httpClient.Do(req)
