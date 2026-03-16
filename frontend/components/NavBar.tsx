@@ -53,7 +53,7 @@ export default function Navbar() {
             {apiKey ? (
               <>
                 <Link 
-                  href="/user_feed" 
+                  href="/posts" 
                   className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
                 >My Feed</Link>
                 <Link 
