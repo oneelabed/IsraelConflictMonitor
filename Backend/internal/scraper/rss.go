@@ -31,37 +31,40 @@ func UrlToFeed(url string) (RSSFeed, error) {
 		Timeout: 10 * time.Second,
 	}
 
-	resp, err := httpClient.Get(url)
+	// 1. Create a custom request
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return RSSFeed{}, err
 	}
 
+	// 2. Add a User-Agent to "pretend" we are a browser
+	// This stops Cloudflare from blocking your Render server
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	req.Header.Set("Accept", "application/rss+xml, application/xml, text/xml")
+
+	// 3. Execute the request
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return RSSFeed{}, err
+	}
 	defer resp.Body.Close()
 
+	// 4. Read the data
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return RSSFeed{}, err
 	}
 
-	/*sanitizedData := html.UnescapeString(string(data))
-	sanitizedData = strings.ReplaceAll(sanitizedData, "&bull;", "•")
-	sanitizedData = strings.ReplaceAll(string(data), "&", "&amp;")*/
+	// Handle special characters
 	xmlString := string(data)
 	xmlString = strings.ReplaceAll(xmlString, "& ", "&amp; ")
 
 	reader := strings.NewReader(xmlString)
 	decoder := xml.NewDecoder(reader)
-
 	decoder.Strict = false
-	// This tells the decoder to automatically handle HTML entities
 	decoder.Entity = xml.HTMLEntity
 
 	rssFeed := RSSFeed{}
-
-	/*err = xml.Unmarshal([]byte(sanitizedData), &rssFeed)
-	if err != nil {
-		return RSSFeed{}, err
-	}*/
 	err = decoder.Decode(&rssFeed)
 	if err != nil {
 		return RSSFeed{}, err
