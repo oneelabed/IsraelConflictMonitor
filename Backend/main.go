@@ -72,7 +72,7 @@ func main() {
 	})
 	v1router.Post("/feed_follows", MiddlewareAuth(&apiCfg, HandlerCreateFeedFollow))
 	v1router.Get("/feed_follows", MiddlewareAuth(&apiCfg, HandlerGetFeedFollows))
-	v1router.Delete("/feed_follows/{feedFollowId}", MiddlewareAuth(&apiCfg, HandlerDeleteFeedFollow))
+	v1router.Delete("/feed_follows", MiddlewareAuth(&apiCfg, HandlerDeleteFeedFollow))
 	v1router.Get("/posts", MiddlewareAuth(&apiCfg, HandlerGetPostsForUser))
 	v1router.Get("/posts/search", MiddlewareAuth(&apiCfg, HandlerSearchPosts))
 	v1router.Get("/posts/diverse", func(w http.ResponseWriter, r *http.Request) {

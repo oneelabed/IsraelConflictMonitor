@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	. "github.com/oneelabed/IsraelConflictMonitor/internal/config"
 	"github.com/oneelabed/IsraelConflictMonitor/internal/database"
@@ -53,16 +52,21 @@ func HandlerGetFeedFollows(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Req
 }
 
 func HandlerDeleteFeedFollow(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request, user database.User) {
-	feed_follow_id_str := chi.URLParam(r, "feedFollowId")
-	feed_follow_id, err := uuid.Parse(feed_follow_id_str)
+	type parameters struct {
+		FeedID uuid.UUID `json:"feed_id"`
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	params := parameters{}
+	err := decoder.Decode(&params)
 	if err != nil {
-		RespondWithError(w, 400, fmt.Sprintf("Couldn't parse feed follow id: %v", err))
+		RespondWithError(w, 400, "Couldn't parse feed follow id:")
 		return
 	}
 
 	err = apiCfg.DB.DeleteFeedFollow(r.Context(), database.DeleteFeedFollowParams{
-		ID:     feed_follow_id,
 		UserID: user.ID,
+		FeedID: params.FeedID,
 	})
 	if err != nil {
 		RespondWithError(w, 400, fmt.Sprintf("Couldn't delete feed follow: %v", err))
