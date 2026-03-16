@@ -17,13 +17,13 @@ type User struct {
 }
 
 type Feed struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Name      string    `json:"name"`
-	Url       string    `json:"url"`
-	IconUrl   string    `json:"icon_url"`
-	UserID    uuid.UUID `json:"user_id"`
+	ID          uuid.UUID `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Name        string    `json:"name"`
+	Url         string    `json:"url"`
+	IconUrl     string    `json:"icon_url"`
+	IsFollowing bool      `json:"is_following"`
 }
 
 type FeedFollow struct {
@@ -76,6 +76,27 @@ func DBFeedsToFeeds(dbFeeds []database.Feed) []Feed {
 		feeds = append(feeds, DBFeedToFeed(feed))
 	}
 
+	return feeds
+}
+
+func DBFeedRowToFeed(dbFeed database.GetFeedsForUserRow) Feed {
+	return Feed{
+		ID:          dbFeed.ID,
+		CreatedAt:   dbFeed.CreatedAt,
+		UpdatedAt:   dbFeed.UpdatedAt,
+		Name:        dbFeed.Name,
+		Url:         dbFeed.Url,
+		IconUrl:     dbFeed.IconUrl,
+		IsFollowing: dbFeed.IsFollowing,
+	}
+}
+
+// 3. Add the slice mapper
+func DBFeedRowsToFeeds(dbFeeds []database.GetFeedsForUserRow) []Feed {
+	feeds := []Feed{}
+	for _, f := range dbFeeds {
+		feeds = append(feeds, DBFeedRowToFeed(f))
+	}
 	return feeds
 }
 

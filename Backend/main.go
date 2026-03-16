@@ -67,9 +67,7 @@ func main() {
 	v1router.Post("/feeds", func(w http.ResponseWriter, r *http.Request) {
 		HandlerCreateFeed(&apiCfg, w, r)
 	})
-	v1router.Get("/feeds", func(w http.ResponseWriter, r *http.Request) {
-		HandlerGetFeeds(&apiCfg, w, r)
-	})
+	v1router.Get("/feeds", MiddlewareAuth(&apiCfg, HandlerGetFeedsForUser))
 	v1router.Post("/feed_follows", MiddlewareAuth(&apiCfg, HandlerCreateFeedFollow))
 	v1router.Get("/feed_follows", MiddlewareAuth(&apiCfg, HandlerGetFeedFollows))
 	v1router.Delete("/feed_follows", MiddlewareAuth(&apiCfg, HandlerDeleteFeedFollow))

@@ -42,12 +42,12 @@ func HandlerCreateFeed(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request
 	RespondWithJSON(w, 201, DBFeedToFeed(feed))
 }
 
-func HandlerGetFeeds(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request) {
-	feeds, err := apiCfg.DB.GetFeeds(r.Context())
+func HandlerGetFeedsForUser(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request, user database.User) {
+	feeds, err := apiCfg.DB.GetFeedsForUser(r.Context(), user.ID)
 	if err != nil {
 		RespondWithError(w, 400, fmt.Sprintf("Couldn't get feeds: %v", err))
 		return
 	}
 
-	RespondWithJSON(w, 201, DBFeedsToFeeds(feeds))
+	RespondWithJSON(w, 200, DBFeedRowsToFeeds(feeds))
 }
