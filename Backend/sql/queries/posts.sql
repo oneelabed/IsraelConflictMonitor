@@ -41,3 +41,10 @@ WHERE feed_follows.user_id = $1
   AND (posts.title ILIKE '%' || $2 || '%' OR posts.description ILIKE '%' || $2 || '%')
 ORDER BY posts.published_at DESC;
 
+-- name: CheckNewPosts :one
+SELECT EXISTS (
+    SELECT 1 FROM posts
+    JOIN feed_follows ON posts.feed_id = feed_follows.feed_id
+    WHERE feed_follows.user_id = $1 
+    AND posts.created_at > (SELECT created_at FROM posts WHERE posts.id = $2)
+);

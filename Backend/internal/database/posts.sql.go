@@ -13,6 +13,27 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkNewPosts = `-- name: CheckNewPosts :one
+SELECT EXISTS (
+    SELECT 1 FROM posts
+    JOIN feed_follows ON posts.feed_id = feed_follows.feed_id
+    WHERE feed_follows.user_id = $1 
+    AND posts.created_at > (SELECT created_at FROM posts WHERE posts.id = $2)
+)
+`
+
+type CheckNewPostsParams struct {
+	UserID uuid.UUID
+	ID     uuid.UUID
+}
+
+func (q *Queries) CheckNewPosts(ctx context.Context, arg CheckNewPostsParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkNewPosts, arg.UserID, arg.ID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createPost = `-- name: CreatePost :one
 INSERT INTO posts (id, created_at, updated_at, title, description, published_at, url, feed_id) 
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
