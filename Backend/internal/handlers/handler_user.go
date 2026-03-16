@@ -117,3 +117,13 @@ func HandlerSearchPosts(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Reques
 
 	RespondWithJSON(w, 200, DBSearchRowsToPosts(posts))
 }
+
+func HandlerGetAllUsers(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request, user database.User) {
+	users, err := apiCfg.DB.GetAllUsers(r.Context())
+	if err != nil {
+		RespondWithError(w, 400, "Could not fetch users")
+		return
+	}
+
+	RespondWithJSON(w, 200, DBUsersToUsers(users))
+}

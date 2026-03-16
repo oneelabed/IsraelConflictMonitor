@@ -14,6 +14,7 @@ type User struct {
 	Username  string    `json:"name"`
 	Password  string    `json:"password_hash"`
 	APIKey    string    `json:"api_key"`
+	Role      string    `json:"role"`
 }
 
 type Feed struct {
@@ -55,7 +56,18 @@ func DBUserToUser(dbUser database.User) User {
 		Username:  dbUser.Username,
 		Password:  dbUser.PasswordHash,
 		APIKey:    dbUser.ApiKey,
+		Role:      dbUser.Role,
 	}
+}
+
+func DBUsersToUsers(dbUsers []database.User) []User {
+	users := []User{}
+
+	for _, user := range dbUsers {
+		users = append(users, DBUserToUser(user))
+	}
+
+	return users
 }
 
 func DBFeedToFeed(dbFeed database.Feed) Feed {

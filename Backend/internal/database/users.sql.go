@@ -17,7 +17,7 @@ INSERT INTO users (id, created_at, updated_at, username, password_hash, api_key)
 VALUES ($1, $2, $3, $4, $5,
     encode(sha256(random()::text::bytea), 'hex')
 )
-RETURNING id, created_at, updated_at, username, password_hash, api_key
+RETURNING id, created_at, updated_at, username, password_hash, role, api_key
 `
 
 type CreateUserParams struct {
@@ -43,13 +43,50 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.UpdatedAt,
 		&i.Username,
 		&i.PasswordHash,
+		&i.Role,
 		&i.ApiKey,
 	)
 	return i, err
 }
 
+const getAllUsers = `-- name: GetAllUsers :many
+SELECT id, created_at, updated_at, username, password_hash, role, api_key FROM users
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getAllUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Username,
+			&i.PasswordHash,
+			&i.Role,
+			&i.ApiKey,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByAPI = `-- name: GetUserByAPI :one
-SELECT id, created_at, updated_at, username, password_hash, api_key FROM users WHERE api_key = $1
+SELECT id, created_at, updated_at, username, password_hash, role, api_key FROM users WHERE api_key = $1
 `
 
 func (q *Queries) GetUserByAPI(ctx context.Context, apiKey string) (User, error) {
@@ -61,13 +98,14 @@ func (q *Queries) GetUserByAPI(ctx context.Context, apiKey string) (User, error)
 		&i.UpdatedAt,
 		&i.Username,
 		&i.PasswordHash,
+		&i.Role,
 		&i.ApiKey,
 	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, created_at, updated_at, username, password_hash, api_key FROM users WHERE username = $1
+SELECT id, created_at, updated_at, username, password_hash, role, api_key FROM users WHERE username = $1
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
@@ -79,6 +117,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.UpdatedAt,
 		&i.Username,
 		&i.PasswordHash,
+		&i.Role,
 		&i.ApiKey,
 	)
 	return i, err

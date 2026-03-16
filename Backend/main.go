@@ -77,6 +77,7 @@ func main() {
 		HandlerGetDiversePosts(&apiCfg, w, r)
 	})
 	v1router.Get("/posts/check-new", MiddlewareAuth(&apiCfg, HandlerCheckNewPosts))
+	v1router.Get("/admin/users", MiddlewareAuth(&apiCfg, HandlerGetAllUsers))
 
 	router.Mount("/v1", v1router)
 
