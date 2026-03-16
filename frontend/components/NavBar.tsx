@@ -50,8 +50,14 @@ export default function Navbar() {
 
           {/* Right Side: Auth Links */}
           <div className="flex items-center gap-6">
-            {apiKey ? (
+            {apiKey ? ( 
               <>
+                {localStorage.getItem("role") === "ADMIN" && (
+                  <Link 
+                    href="/admin" 
+                    className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                  >Admin Page</Link>)}
+              
                 <Link 
                   href="/posts" 
                   className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
@@ -64,6 +70,7 @@ export default function Navbar() {
                   onClick={() => {
                     localStorage.removeItem("api_key");
                     localStorage.removeItem("username");
+                    localStorage.removeItem("role");
                     window.location.href = "/"; // Forces a hard refresh to clear the state
                   }}
                   className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"

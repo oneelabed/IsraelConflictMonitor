@@ -24,6 +24,7 @@ export default function SignUp() {
       
       localStorage.setItem("api_key", userData.api_key);
       localStorage.setItem("username", userData.name);
+      localStorage.setItem("role", userData.role);
 
       console.log("Logged in successfully:", userData);
 
