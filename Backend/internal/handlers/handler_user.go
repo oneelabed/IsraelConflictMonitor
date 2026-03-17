@@ -10,6 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	. "github.com/oneelabed/IsraelConflictMonitor/internal/config"
 	"github.com/oneelabed/IsraelConflictMonitor/internal/database"
 )
@@ -44,6 +45,13 @@ func HandlerCreateUser(apiCfg *ApiConfig, w http.ResponseWriter, r *http.Request
 		PasswordHash: string(hashedPassword),
 	})
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			// "23505" is the code for unique_violation (username already exists)
+			if pqErr.Code == "23505" {
+				RespondWithError(w, http.StatusConflict, "Username already taken")
+				return
+			}
+		}
 		RespondWithError(w, 400, fmt.Sprintf("Couldn't create user: %v", err))
 		return
 	}

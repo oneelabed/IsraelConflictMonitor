@@ -12,6 +12,10 @@ export async function createUser(username: string, password: string) {
     }),
   });
   
+  if (res.status === 409) {
+    throw new Error('Username already taken');
+  }
+
   if (!res.ok) throw new Error('Failed to create user');
   return res.json();
 }
