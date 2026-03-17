@@ -15,7 +15,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Israel Conflict Monitor",
-  description: "Real-time updates and news monitoring",
+  description: "Real-time intelligence dashboard for verified news.",
+  openGraph: {
+    title: "Israel Conflict Monitor",
+    description: "Real-time intelligence dashboard",
+    url: "https://israelconflictmonitor.org",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
