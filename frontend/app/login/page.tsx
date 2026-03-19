@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { login } from "@/lib/actions/login";
 import { useRouter } from "next/navigation";
+import Cookies from 'js-cookie';
 
 export default function SignUp() {
   const router = useRouter();
@@ -22,9 +23,10 @@ export default function SignUp() {
     try {
       const userData = await login(username.toLowerCase(), password);
       
-      localStorage.setItem("api_key", userData.api_key);
-      localStorage.setItem("username", userData.name);
-      localStorage.setItem("role", userData.role);
+      // 'expires: 1' means it lasts for 1 day
+      Cookies.set("api_key", userData.api_key, { expires: 1, path: '/' });
+      Cookies.set("role", userData.role, { expires: 1, path: '/' });
+      Cookies.set("username", userData.name, { expires: 1, path: '/' });
 
       console.log("Logged in successfully:", userData);
 
