@@ -5,6 +5,7 @@ import { Post } from "@/types/Post"
 import PostCard from "@/components/PostCard"
 import { Loader2, Newspaper, Search, X, RefreshCcw } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -14,6 +15,15 @@ export default function UserFeedPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isSearching, setIsSearching] = useState(false)
   const [newPostsAvailable, setNewPostsAvailable] = useState(false)
+  const router = useRouter();
+  
+  useEffect(() => {
+    const apiKey = localStorage.getItem("api_key");
+    
+    if (!apiKey) {
+      router.push("/login");
+    }
+  }, [router]);
 
   const checkForUpdates = async () => {
     if (posts.length === 0) return;

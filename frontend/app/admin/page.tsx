@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Plus, Globe, Link as LinkIcon, Image as ImageIcon, Loader2, Users, ShieldCheck, Calendar, Key } from "lucide-react"
+import { useRouter } from "next/navigation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -11,6 +12,17 @@ export default function AdminPage() {
   const [formData, setFormData] = useState({ name: "", url: "", icon_url: "" })
   const [users, setUsers] = useState<any[]>([])
   const [loadingUsers, setLoadingUsers] = useState(true)
+  const router = useRouter();
+  
+  useEffect(() => {
+    const apiKey = localStorage.getItem("api_key");
+    const role = localStorage.getItem("role");
+
+    if (!apiKey || role !== "admin") {
+      // If not an admin, send them to the home page or a "Forbidden" page
+      router.push("/");
+    }
+  }, [router]);
 
   useEffect(() => {
     const fetchUsers = async () => {
