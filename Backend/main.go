@@ -42,6 +42,11 @@ func main() {
 		DB: database.New(conn),
 	}
 
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
 	go StartScraping(apiCfg.DB, 23, time.Minute*20)
 	startCleanupWorker(&apiCfg)
 
