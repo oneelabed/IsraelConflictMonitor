@@ -52,6 +52,8 @@ func main() {
 
 	router := chi.NewRouter()
 
+	router.Get("/healthz", HandlerReadiness)
+
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -62,7 +64,6 @@ func main() {
 	}))
 
 	v1router := chi.NewRouter()
-	v1router.Get("/healthz", HandlerReadiness)
 	v1router.Get("/err", HandlerError)
 	v1router.Post("/users", func(w http.ResponseWriter, r *http.Request) {
 		HandlerCreateUser(&apiCfg, w, r)
