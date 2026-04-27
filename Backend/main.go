@@ -47,7 +47,7 @@ func main() {
 		w.Write([]byte("OK"))
 	})
 
-	go StartScraping(apiCfg.DB, 23, time.Minute*20)
+	go StartScraping(apiCfg.DB, 23, time.Minute*15)
 	startCleanupWorker(&apiCfg)
 
 	router := chi.NewRouter()
